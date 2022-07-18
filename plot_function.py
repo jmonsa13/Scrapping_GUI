@@ -176,7 +176,7 @@ def plot_price_index(df, group, mansfield_prod, title, orient_h=False):
 
     # Configuration second plot
     fig.update_xaxes(row=1, col=2)  # title_text="Mansfield Product",
-    fig.update_yaxes(title_text="% Price Index", ticksuffix="%", range=[50, 150], row=1, col=2)
+    fig.update_yaxes(title_text="% Price Index", ticksuffix="%", range=[40, 160], dtick=20, row=1, col=2)
 
     # Hover
     fig.update_traces(hovertemplate='%{y}',

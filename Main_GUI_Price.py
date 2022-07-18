@@ -157,14 +157,14 @@ if page == "USA Market":
         except:
             url_image = product_ref["Image_url"].iloc[-1].replace(" ", "%20")  # Replacing whitespace
 
-            # Introduccing header to avoid erro 404
+            # Introducing header to avoid error 404
             opener = urllib.request.build_opener()
             opener.addheaders = [('User-agent', 'Mozilla/5.0')]
             urllib.request.install_opener(opener)
             try:
-                urllib.request.urlretrieve(url_image, "01_Ref_images/image.png")
+                urllib.request.urlretrieve(url_image, "01_Ref_images/image_info.png")
                 # Loading image
-                image = Image.open('01_Ref_images/image.png')
+                image = Image.open('01_Ref_images/image_info.png')
             except urllib.error.URLError as e:
                 print(e.__dict__)
                 # Loading image
@@ -206,8 +206,8 @@ if page == "USA Market":
     sku_mansfield = mansfield_product.iloc[-1]['SKU']
 
     # Requesting the image
-    urllib.request.urlretrieve(mansfield_product["Image_url"].iloc[-1], "image.png")
-    image = Image.open('image.png')
+    urllib.request.urlretrieve(mansfield_product["Image_url"].iloc[-1], "01_Ref_images/image_mansfield.png")
+    image = Image.open('01_Ref_images/image_mansfield.png')
     cc1.image(image, caption='{} ({}) ${:,} {}'.format(mansfield_product["Producto"].iloc[-1],
                                                        mansfield_product["SKU"].iloc[-1],
                                                        mansfield_product["Precio"].iloc[-1],
