@@ -60,7 +60,7 @@ def plot_price_history(df, group, title, orient_h=False):
     )
 
     if orient_h is True:
-        fig.update_layout(legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+        fig.update_layout(legend=dict(orientation="h", yanchor="top", y=-0.13,  xanchor="left", x=0.01),
                           legend_title="Products")
     fig.update_xaxes(
         tickformatstops=[
@@ -116,12 +116,12 @@ def plot_price_index(df, group, mansfield_prod, title, orient_h=False):
     df_index = df[df['Fecha'] == df['Fecha'].iloc[-1]][['Fecha', group, 'Producto', 'Precio']]
     mansfield_ref = df_index[df_index['Producto'] == mansfield_prod]['Precio'].values
 
-    df_index['Price_index'] = (((mansfield_ref - df_index['Precio']) / df_index['Precio']) * 100) + 100
+    df_index['Price_index'] = np.round(((mansfield_ref / df_index['Precio']) * 100), 2)
 
     # Plotting scatter plot
     for i, product in enumerate(product_order):
         df_aux = df_index[df_index[group] == product]
-        fig.add_trace(go.Scatter(x=[mansfield_prod], y=np.round(df_aux['Price_index'], 2),
+        fig.add_trace(go.Scatter(x=[mansfield_prod], y=df_aux['Price_index'],
                                  name=product, legendgroup=product,
                                  line_color=line_color[i], mode='markers',
                                  showlegend=False),
@@ -179,7 +179,75 @@ def plot_price_index(df, group, mansfield_prod, title, orient_h=False):
     fig.update_yaxes(title_text="% Price Index", ticksuffix="%", range=[40, 160], dtick=20, row=1, col=2)
 
     # Hover
-    fig.update_traces(hovertemplate='%{y}',
-                      row=1, col=2)
+    fig.update_traces(hovertemplate='%{y}', row=1, col=2)
+
+    return fig
+
+
+def plot_price_index_summary(df, comp_df, sku_list_mansfield, title, orient_h=False):
+    """
+    Función que crea el gráfico de historico de precio.
+    :param df: data frame con los precios y la historia.
+    :param title: Título de la gráfica.
+    :param orient_h: Default FALSE, para poner los legend de manera horizontal.
+    :return: fig: Objeto de plotly para graficar externamente.
+    """
+    # Initialization
+    fig = go.Figure()
+
+    # Color Scheme definition
+    line_color = {'Mansfield': 'rgba(255,127,0, 1)', 'American Standard': 'rgba(44, 160, 44, 1)',
+                  'Gerber': 'rgba(214, 39, 40, 1)',
+                  'Western Pottery': 'rgba(148, 103, 189, 1)'}
+                  # 'rgba(140, 86, 75, 1)', 'rgba(227, 119, 194, 1)', 'rgba(127, 127, 127, 1)',
+                  # 'rgba(188, 189, 34, 1)', 'rgba(23, 190, 207,1)', 'rgba(31, 119, 180, 1)'}
+
+    # Cont
+    cont = 0
+    flag = True
+
+    # Products to visualize
+    for i, sku_mansfield in enumerate(sku_list_mansfield):
+        # sku competitors
+        sku_comp = comp_df[comp_df['Homologo'] == sku_mansfield]['Sku']
+
+        # Filter df
+        df_comp = df[df['SKU_str'].isin(list(sku_comp))]
+
+        # Calculating the price index
+        df_info_price = df_comp[df_comp['Fecha'] == df_comp['Fecha'].iloc[-1]].copy()
+        mansfield_ref = df_info_price[df_info_price['SKU_str'] == sku_mansfield]['Precio'].values
+        mansfield_prod = df_info_price[df_info_price['SKU_str'] == sku_mansfield]['Producto_sku'].values
+
+        df_info_price['Price_index'] = np.round(((mansfield_ref / df_info_price['Precio']) * 100), 2)
+
+        for j, product in enumerate(df_info_price['Producto_sku'].unique()):
+            df_aux = df_info_price[df_info_price['Producto_sku'] == product]
+
+            fig.add_trace(go.Scatter(x=[i], y=df_aux['Price_index'],
+                                     name=df_aux['Fabricante'].iloc[0], legendgroup=df_aux['Fabricante'].iloc[0],
+                                     line_color=line_color[df_aux['Fabricante'].iloc[0]],
+                                     mode='markers+text', marker_symbol='diamond', marker_size=8,
+                                     text=f"{df_aux['Price_index'].iloc[0]}%", textposition="middle right",
+                                     showlegend=flag))
+            # Changing the xlabels
+            fig.data[cont].x = mansfield_prod
+            cont += 1
+        flag = False
+
+    # Title and template
+    fig.update_layout(modebar_add=["v1hovermode", "toggleSpikeLines"], title_text=title, template="seaborn")
+
+    if orient_h is True:
+        fig.update_layout(legend=dict(orientation="h", yanchor="top", y=-0.12, xanchor="left", x=0.01),
+                          legend_title="Products")
+
+    # Update xaxis, yaxis properties
+    fig.update_xaxes(showline=True, linewidth=0.5, linecolor='black')
+    fig.update_yaxes(showline=True, linewidth=0.5, linecolor='black')
+
+    # Configuration
+    fig.update_yaxes(title_text="% Price Index", ticksuffix="%", range=[40, 140], dtick=10)
+    fig.update_traces(hovertemplate='%{y}')
 
     return fig

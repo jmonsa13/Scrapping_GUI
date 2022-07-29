@@ -73,7 +73,7 @@ st.set_page_config(page_title="Price Monitoring",
                    page_icon="📈",
                    layout="wide")
 
-st.title('💲General Summary - Price Monitoring')
+st.title('💲Price Monitoring -  Mansfield')
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 st.header('1) Price Over Time')
@@ -225,6 +225,7 @@ df_comp = df[df['SKU_str'].isin(list(sku_comp))]
 # Plot price index
 fig = plot_price_index(df=df_comp, group="Producto_sku", mansfield_prod=mansfield_product_sel,
                        title=f"Mansfield Price index for {mansfield_product_sel}", orient_h=True)
+fig.update_layout(height=500)
 cc2.plotly_chart(fig, use_container_width=True)
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -232,19 +233,19 @@ cc2.plotly_chart(fig, use_container_width=True)
 st.markdown("""---""")
 
 # Price index
-df_info_price = df_comp[df_comp['Fecha'] == df_comp['Fecha'].iloc[-1]]
+df_info_price = df_comp[df_comp['Fecha'] == df_comp['Fecha'].iloc[-1]].copy()
 mansfield_ref = df_info_price[df_info_price['Producto'] == mansfield_product_sel]['Precio'].values
 df_info_price['Price_index'] = np.round(((mansfield_ref / df_info_price['Precio']) * 100), 2)
 
 # Calculating overall price index
 overall_price_index = np.round((df_info_price['Price_index'].abs().sum() - 100) / (len(df_info_price) - 1), 2)
 
-ccc1, ccc2 = st.columns((1, 3))
+ccc1, ccc2 = st.columns((1, 8))
 with ccc1:
     st.metric(label="Overall Price Index", value=f"{overall_price_index}%")
 
 with ccc2:
-    AgGrid(df_info_price[['Fecha', 'Market_Place', 'Linea', 'Producto', 'Precio', 'URL']],
+    AgGrid(df_info_price[['Fecha', 'Market_Place', 'Linea', 'Producto', 'Precio', 'Price_index', 'URL']],
            editable=True, sortable=True, filter=True, resizable=True, defaultWidth=5, height=140,
            fit_columns_on_grid_load=False, theme="streamlit",  # "light", "dark", "blue", "material"
            key="price_index", reload_data=True,  # gridOptions=gridoptions,
