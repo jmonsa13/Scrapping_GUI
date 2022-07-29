@@ -55,6 +55,16 @@ df['Producto_sku'] = ['_'.join(i) for i in zip(df['Producto'], df['SKU'].map(str
 
 # String the SKU
 df['SKU_str'] = df['SKU'].map(str)
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Loading the Master Database
+# Reading files with the directory for comparisons
+comp_df = pd.read_excel('XX_Master_database/Productos Mansfield.xlsx')
+
+# Organizing the SKU
+comp_df['Homologo'] = comp_df['Homologo Mansfield'].map(str)
+comp_df['Homologo'] = comp_df['Homologo'].apply(lambda x: x.strip())
+
 # ----------------------------------------------------------------------------------------------------------------------
 # Streamlit Setting
 # ----------------------------------------------------------------------------------------------------------------------
@@ -63,7 +73,7 @@ st.set_page_config(page_title="Price Monitoring",
                    page_icon="📈",
                    layout="wide")
 
-st.title('💲 Price Monitoring - Mansfield 📈')
+st.title('💲General Summary - Price Monitoring')
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 st.header('1) Price Over Time')
@@ -175,9 +185,6 @@ else:
 # ----------------------------------------------------------------------------------------------------------------------
 st.header('2) Comparison Products Mansfield')
 
-# Reading files with the directory for comparisons
-comp_df = pd.read_excel('XX_Master_database/Productos Mansfield.xlsx')
-
 # Mansfield df
 Mansfield_df = df[df["Fabricante"] == 'Mansfield']
 
@@ -209,10 +216,6 @@ cc1.image(image, caption='{} ({}) ${:,} {}'.format(mansfield_product["Producto"]
 # General information
 cc1.markdown("**The url of the product is:** {}".format(mansfield_product["URL"].iloc[-1]))
 
-# Organizing the SKU
-comp_df['Homologo'] = comp_df['Homologo Mansfield'].map(str)
-comp_df['Homologo'] = comp_df['Homologo'].apply(lambda x: x.strip())
-
 # Products to visualize
 sku_comp = comp_df[comp_df['Homologo'] == str(sku_mansfield)]['Sku']
 
@@ -231,19 +234,18 @@ st.markdown("""---""")
 # Price index
 df_info_price = df_comp[df_comp['Fecha'] == df_comp['Fecha'].iloc[-1]]
 mansfield_ref = df_info_price[df_info_price['Producto'] == mansfield_product_sel]['Precio'].values
-df_info_price['Price_index'] = np.round((((mansfield_ref - df_info_price['Precio']) / df_info_price['Precio'])
-                                         * 100) + 100, 2)
+df_info_price['Price_index'] = np.round(((mansfield_ref / df_info_price['Precio']) * 100), 2)
+
 # Calculating overall price index
-df_info_price['Price_index_2'] = (((mansfield_ref - df_info_price['Precio']) / df_info_price['Precio']) * 100)
-overall_price_index = np.round(df_info_price['Price_index_2'].abs().sum() / (len(df_info_price) - 1), 2)
+overall_price_index = np.round((df_info_price['Price_index'].abs().sum() - 100) / (len(df_info_price) - 1), 2)
 
 ccc1, ccc2 = st.columns((1, 3))
 with ccc1:
     st.metric(label="Overall Price Index", value=f"{overall_price_index}%")
 
 with ccc2:
-    AgGrid(df_info_price[['Fecha','Market_Place', 'Linea', 'Producto', 'Precio', 'Price_index_2', 'URL']],
-           editable=False, sortable=True, filter=True, resizable=True, defaultWidth=5, height=140,
+    AgGrid(df_info_price[['Fecha', 'Market_Place', 'Linea', 'Producto', 'Precio', 'URL']],
+           editable=True, sortable=True, filter=True, resizable=True, defaultWidth=5, height=140,
            fit_columns_on_grid_load=False, theme="streamlit",  # "light", "dark", "blue", "material"
            key="price_index", reload_data=True,  # gridOptions=gridoptions,
            enable_enterprise_modules=False)
