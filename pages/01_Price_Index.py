@@ -14,7 +14,7 @@ from PIL import Image
 import streamlit as st
 from st_aggrid import AgGrid
 
-from plot_function import plot_price_history, plot_price_index
+from plot_function import plot_price_history, plot_price_history_index
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Function Definition
@@ -223,8 +223,8 @@ sku_comp = comp_df[comp_df['Homologo'] == str(sku_mansfield)]['Sku']
 df_comp = df[df['SKU_str'].isin(list(sku_comp))]
 
 # Plot price index
-fig = plot_price_index(df=df_comp, group="Producto_sku", mansfield_prod=mansfield_product_sel,
-                       title=f"Mansfield Price index for {mansfield_product_sel}", orient_h=True)
+fig = plot_price_history_index(df=df_comp, group="Producto_sku", mansfield_prod=mansfield_product_sel,
+                               title=f"Mansfield Price index for {mansfield_product_sel}", orient_h=True)
 fig.update_layout(height=500)
 cc2.plotly_chart(fig, use_container_width=True)
 

@@ -13,7 +13,7 @@ from PIL import Image
 import streamlit as st
 from st_aggrid import AgGrid
 
-from plot_function import plot_price_history, plot_price_index_summary
+from plot_function import plot_price_history_summary, plot_price_index_summary
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -87,7 +87,7 @@ st.header('Mansfield Price Index Summary')
 
 # # Plot price index summary
 fig = plot_price_index_summary(df=df, comp_df=comp_df, sku_list_mansfield= sku_list_mansfield,
-                        title=f"Mansfield Price Index", orient_h=True)
+                               title=f"Mansfield Price Index", orient_h=True)
 st.plotly_chart(fig, use_container_width=True)
 
 
@@ -118,8 +118,9 @@ sku_comp = comp_df[comp_df['Homologo'] == str(sku_mansfield)]['Sku']
 df_comp = df[df['SKU_str'].isin(list(sku_comp))]
 
 # Plot price history
-fig = plot_price_history(df=df_comp, group="Producto_sku", title=f"Mansfield Price index for {mansfield_product_sel}",
-                         orient_h=True)
+fig = plot_price_history_summary(df=df_comp, group="Producto_sku",
+                                 title=f"Mansfield Price index for {mansfield_product_sel}",
+                                 orient_h=True)
 
 fig.update_layout(height=420)
 c2.plotly_chart(fig, use_container_width=True)
