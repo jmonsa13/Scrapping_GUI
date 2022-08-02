@@ -33,7 +33,7 @@ def load_data(filename="Decorceramica_twopieces.csv"):
 # ----------------------------------------------------------------------------------------------------------------------
 # Loading the files
 # Folder path definition
-directory = '.\\XX_Data'
+directory = './XX_Data'
 
 files_list = []
 for path, _, files in os.walk(directory):
