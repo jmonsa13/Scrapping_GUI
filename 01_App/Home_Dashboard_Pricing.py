@@ -13,7 +13,7 @@ from PIL import Image
 import streamlit as st
 from st_aggrid import AgGrid
 
-from plot_function import plot_price_history_summary, plot_price_index_summary
+from sources.plot_function import plot_price_history_summary, plot_price_index_summary
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -33,7 +33,7 @@ def load_data(filename="Decorceramica_twopieces.csv"):
 # ----------------------------------------------------------------------------------------------------------------------
 # Loading the files
 # Folder path definition
-directory = './XX_Data'
+directory = './data'
 
 files_list = []
 for path, _, files in os.walk(directory):
@@ -59,7 +59,7 @@ df['SKU_str'] = df['SKU'].map(str)
 # ----------------------------------------------------------------------------------------------------------------------
 # Loading the Master Database
 # Reading files with the directory for comparisons
-comp_df = pd.read_excel('XX_Master_database/Productos Mansfield.xlsx')
+comp_df = pd.read_excel('sources/Productos Mansfield.xlsx')
 
 # Organizing the SKU
 comp_df['Homologo'] = comp_df['Homologo Mansfield'].map(str)
@@ -100,8 +100,8 @@ mansfield_product = Mansfield_df[Mansfield_df['Producto'] == mansfield_product_s
 sku_mansfield = mansfield_product.iloc[-1]['SKU']
 
 # Requesting the image
-urllib.request.urlretrieve(mansfield_product["Image_url"].iloc[-1], "01_Ref_images/image_mansfield.png")
-image = Image.open('01_Ref_images/image_mansfield.png')
+urllib.request.urlretrieve(mansfield_product["Image_url"].iloc[-1], "images/image_mansfield.png")
+image = Image.open('images/image_mansfield.png')
 c1.image(image, caption='{} ({}) ${:,} {}'.format(mansfield_product["Producto"].iloc[-1],
                                                   mansfield_product["SKU"].iloc[-1],
                                                   mansfield_product["Precio"].iloc[-1],
