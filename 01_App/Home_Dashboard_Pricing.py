@@ -15,7 +15,6 @@ from st_aggrid import AgGrid
 
 from sources.plot_function import plot_price_history_summary, plot_price_index_summary
 
-
 # ----------------------------------------------------------------------------------------------------------------------
 # Function Definition
 # ----------------------------------------------------------------------------------------------------------------------

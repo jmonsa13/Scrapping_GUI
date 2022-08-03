@@ -109,15 +109,16 @@ def plot_price_history_index(df, group, mansfield_prod, title, orient_h=False):
     for product in df[group].unique():
         df_aux = df[df[group] == product]
         product_order.append(product)
-        fig.add_trace(go.Scatter(x=df_aux['Fecha'], y=df_aux['Precio'], name=product, legendgroup=product,
+        fig.add_trace(go.Scatter(x=df_aux['Fecha'], y=df_aux['Precio_factor'], name=product, legendgroup=product,
                                  line_color=line_color[df_aux['Fabricante'].iloc[0]], mode='lines+markers'),
                       row=1, col=1)
 
     # Calculating the price index
-    df_index = df[df['Fecha'] == df['Fecha'].iloc[-1]][['Fecha','Fabricante',  group, 'Producto', 'Precio']]
-    mansfield_ref = df_index[df_index['Producto'] == mansfield_prod]['Precio'].values
+    df_index = df[df['Fecha'] == df['Fecha'].iloc[-1]][['Fecha', 'Fabricante',  group, 'Producto',
+                                                        'Precio', 'Precio_factor']]
+    mansfield_ref = df_index[df_index['Producto'] == mansfield_prod]['Precio_factor'].values
 
-    df_index['Price_index'] = np.round(((mansfield_ref / df_index['Precio']) * 100), 2)
+    df_index['Price_index'] = np.round(((mansfield_ref / df_index['Precio_factor']) * 100), 2)
 
     # Plotting scatter plot
     for product in product_order:

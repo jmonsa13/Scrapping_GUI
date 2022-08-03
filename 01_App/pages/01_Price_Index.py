@@ -3,18 +3,14 @@
 # ----------------------------------------------------------------------------------------------------------------------
 # Libraries import
 # ----------------------------------------------------------------------------------------------------------------------
-import urllib.request
-
 import os
-import math
+
 import numpy as np
 import pandas as pd
-
-from PIL import Image
 import streamlit as st
-from st_aggrid import AgGrid
-
 from sources.plot_function import plot_price_history, plot_price_history_index
+from sources.tools import url_image_capture, visual_info_multiplier
+from st_aggrid import AgGrid
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Function Definition
@@ -153,24 +149,7 @@ else:
     product_ref = df_filter[df_filter["Producto_sku"] == ref]
 
     # Requesting the image | Download image from URL if possible
-    try:
-        if math.isnan(product_ref["Image_url"].iloc[-1]):
-            image = Image.open('images/Empty.png')
-    except:
-        url_image = product_ref["Image_url"].iloc[-1].replace(" ", "%20")  # Replacing whitespace
-
-        # Introducing header to avoid error 404
-        opener = urllib.request.build_opener()
-        opener.addheaders = [('User-agent', 'Mozilla/5.0')]
-        urllib.request.install_opener(opener)
-        try:
-            urllib.request.urlretrieve(url_image, "images/image_info.png")
-            # Loading image
-            image = Image.open('images/image_info.png')
-        except urllib.error.URLError as e:
-            print(e.__dict__)
-            # Loading image
-            image = Image.open('images/Empty.png')
+    image = url_image_capture(product_ref["Image_url"].iloc[-1])
 
     # Plot image
     st.image(image, caption='{} ({}) ${:,} {}'.format(product_ref["Producto"].iloc[-1],
@@ -198,23 +177,15 @@ else:
     Mansfield_df = Mansfield_df[Mansfield_df["Tipo"] == format_mansfield_sel]
 
 # Mansfield product to compare
-mansfield_product_sel = cc1.selectbox("Which Mansfield product wants to compare?",
+mansfield_product_sel = cc2.selectbox("Which Mansfield product wants to compare?",
                                       Mansfield_df["Producto"].unique(), 0)
-
+# Line separation
+st.markdown("""---""")
+# ----------------------------------------------------------------------------------------------------------------------
+# Dataframe filtering and separation
+# Filter Mansfield product
 mansfield_product = Mansfield_df[Mansfield_df['Producto'] == mansfield_product_sel]
 sku_mansfield = mansfield_product.iloc[-1]['SKU']
-
-# Requesting the image
-urllib.request.urlretrieve(mansfield_product["Image_url"].iloc[-1], "images/image_mansfield.png")
-image = Image.open('images/image_mansfield.png')
-cc1.image(image, caption='{} ({}) ${:,} {}'.format(mansfield_product["Producto"].iloc[-1],
-                                                   mansfield_product["SKU"].iloc[-1],
-                                                   mansfield_product["Precio"].iloc[-1],
-                                                   mansfield_product["Moneda"].iloc[-1]).replace(',', '.'),
-          width=300)
-
-# General information
-cc1.markdown("**The url of the product is:** {}".format(mansfield_product["URL"].iloc[-1]))
 
 # Products to visualize
 sku_comp = comp_df[comp_df['Homologo'] == str(sku_mansfield)]['Sku']
@@ -222,20 +193,30 @@ sku_comp = comp_df[comp_df['Homologo'] == str(sku_mansfield)]['Sku']
 # Filter df
 df_comp = df[df['SKU_str'].isin(list(sku_comp))]
 
+# ----------------------------------------------------------------------------------------------------------------------
+# Visualization of the products and multiplier selection
+df_comp = visual_info_multiplier(df_comp)
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Plotting history and price index
+# Line separation
+st.markdown("""---""")
+
 # Plot price index
 fig = plot_price_history_index(df=df_comp, group="Producto_sku", mansfield_prod=mansfield_product_sel,
                                title=f"Mansfield Price index for {mansfield_product_sel}", orient_h=True)
 fig.update_layout(height=500)
-cc2.plotly_chart(fig, use_container_width=True)
+st.plotly_chart(fig, use_container_width=True)
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Price index summary and data explorer
+# Line separation
 st.markdown("""---""")
 
 # Price index
 df_info_price = df_comp[df_comp['Fecha'] == df_comp['Fecha'].iloc[-1]].copy()
-mansfield_ref = df_info_price[df_info_price['Producto'] == mansfield_product_sel]['Precio'].values
-df_info_price['Price_index'] = np.round(((mansfield_ref / df_info_price['Precio']) * 100), 2)
+mansfield_ref = df_info_price[df_info_price['Producto'] == mansfield_product_sel]['Precio_factor'].values
+df_info_price['Price_index'] = np.round(((mansfield_ref / df_info_price['Precio_factor']) * 100), 2)
 
 # Calculating overall price index
 overall_price_index = np.round((df_info_price['Price_index'].abs().sum() - 100) / (len(df_info_price) - 1), 2)
@@ -245,7 +226,8 @@ with ccc1:
     st.metric(label="Overall Price Index", value=f"{overall_price_index}%")
 
 with ccc2:
-    AgGrid(df_info_price[['Fecha', 'Market_Place', 'Linea', 'Producto', 'Precio', 'Price_index', 'URL']],
+    AgGrid(df_info_price[['Fecha', 'Market_Place', 'Linea', 'Producto', 'Precio', 'Precio_factor',
+                          'Price_index', 'URL']],
            editable=True, sortable=True, filter=True, resizable=True, defaultWidth=5, height=140,
            fit_columns_on_grid_load=False, theme="streamlit",  # "light", "dark", "blue", "material"
            key="price_index", reload_data=True,  # gridOptions=gridoptions,
