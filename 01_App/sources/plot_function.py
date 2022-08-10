@@ -98,8 +98,8 @@ def plot_price_history_index(df, group, mansfield_prod, title, orient_h=False):
                         )
 
     # Color Scheme definition
-    line_color = {'Mansfield': 'rgba(255,127,0, 1)', 'American Standard': 'rgba(44, 160, 44, 1)',
-                  'Gerber': 'rgba(214, 39, 40, 1)',
+    line_color = {'Mansfield': 'rgba(23,55,95, 1)', 'American Standard': 'rgba(0, 0, 0, 1)',
+                  'Gerber': 'rgba(1, 139, 250, 1)',
                   'Western Pottery': 'rgba(148, 103, 189, 1)'}
                   # 'rgba(140, 86, 75, 1)', 'rgba(227, 119, 194, 1)', 'rgba(127, 127, 127, 1)',
                   # 'rgba(188, 189, 34, 1)', 'rgba(23, 190, 207,1)', 'rgba(31, 119, 180, 1)'}
@@ -157,7 +157,7 @@ def plot_price_history_index(df, group, mansfield_prod, title, orient_h=False):
     )
 
     if orient_h is True:
-        fig.update_layout(legend=dict(orientation="h", yanchor="top", y=-0.12,  xanchor="left", x=0.01),
+        fig.update_layout(legend=dict(orientation="h", yanchor="top", y=-0.13,  xanchor="left", x=0.01),
                           legend_title="Products")
 
     # Update xaxis, yaxis properties
@@ -198,8 +198,8 @@ def plot_price_index_summary(df, comp_df, sku_list_mansfield, title, orient_h=Fa
     fig = go.Figure()
 
     # Color Scheme definition
-    line_color = {'Mansfield': 'rgba(255,127,0, 1)', 'American Standard': 'rgba(44, 160, 44, 1)',
-                  'Gerber': 'rgba(214, 39, 40, 1)',
+    line_color = {'Mansfield': 'rgba(23,55,95, 1)', 'American Standard': 'rgba(0, 0, 0, 1)',
+                  'Gerber': 'rgba(1, 139, 250, 1)',
                   'Western Pottery': 'rgba(148, 103, 189, 1)'}
                   # 'rgba(140, 86, 75, 1)', 'rgba(227, 119, 194, 1)', 'rgba(127, 127, 127, 1)',
                   # 'rgba(188, 189, 34, 1)', 'rgba(23, 190, 207,1)', 'rgba(31, 119, 180, 1)'}
@@ -267,8 +267,8 @@ def plot_price_history_summary(df, group, title, orient_h=False):
     fig = go.Figure()
 
     # Color Scheme definition
-    line_color = {'Mansfield': 'rgba(255,127,0, 1)', 'American Standard': 'rgba(44, 160, 44, 1)',
-                  'Gerber': 'rgba(214, 39, 40, 1)',
+    line_color = {'Mansfield': 'rgba(23,55,95, 1)', 'American Standard': 'rgba(0, 0, 0, 1)',
+                  'Gerber': 'rgba(1, 139, 250, 1)',
                   'Western Pottery': 'rgba(148, 103, 189, 1)'}
                   # 'rgba(140, 86, 75, 1)', 'rgba(227, 119, 194, 1)', 'rgba(127, 127, 127, 1)',
                   # 'rgba(188, 189, 34, 1)', 'rgba(23, 190, 207,1)', 'rgba(31, 119, 180, 1)'}
@@ -314,7 +314,7 @@ def plot_price_history_summary(df, group, title, orient_h=False):
     fig.update_xaxes(title_text='Date', showline=True, linewidth=0.5, linecolor='black')
     fig.update_yaxes(title_text="Price in USD", showline=True, linewidth=0.5, linecolor='black')
 
-    fig.update_yaxes( tickprefix="$", tickformat=",.2f")
+    fig.update_yaxes(tickprefix="$", tickformat=",.2f")
 
     fig.update_xaxes(
         tickformatstops=[
